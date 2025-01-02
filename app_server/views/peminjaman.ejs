@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <style>
+        table{
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th,td {
+            border: 1px solid rgb(28, 30, 29);
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: rgb(54, 91, 147);
+        }
+    </style>
+</head>
+<h1>Peminjaman Buku</h1>
+<form action="/peminjaman/store" method="POST">
+    <div class="mb-3">
+      <label for="tanggalPinjam" class="form-label">Tanggal Pinjaman</label>
+      <input type="date" class="form-control" id="tanggalPinjam" name="tanggalPinjam" required />
+    </div>
+    <div class="mb-3">
+      <label for="tanggalKembali" class="form-label">Tanggal Kembalian</label>
+      <input
+        type="date"
+        class="form-control"
+        id="tanggalKembali"
+        name="tanggalKembali"
+        required
+      />
+    </div>
+    <div class="mb-3">
+        <label for="batasPinjam" class="form-label">Batas Pinjam</label>
+        <input
+          type="text"
+          class="form-control"
+          id="batasPinjam"
+          name="batasPinjam"
+          required
+        />
+      </div>
+    <div class="mb-3">
+        <label for="buku_id" class="form-label">Buku</label>
+        <select class="form-control" id="buku_id" name="buku_id" required>
+          <option value="">-- Pilih Buku --</option>
+          <% bukuList.forEach(buku => { %>
+              <option value="<%= buku._id %>"><%= buku.nama %></option>
+          <% }) %>
+      </select>
+      </div>
+      
+    <button type="submit" class="btn btn-primary">Tambah Pinjam</button>
+  </form>
+  
+<table class="table table-striped">
+    <tr>
+        <th>Tanggal Pinjam</th>
+        <th>Tanggal Kembalian</th>
+        <th>Batas Pinjam</th>
+        <th>Nama Buku</th>
+        <th>Aksi</th>
+    </tr>
+    <% peminjaman.forEach(data => {%>
+    <tr>
+        <td><%= data.tanggalPinjam %></td>
+        <td><%= data.tanggalKembali %></td>
+        <td><%= data.batasPinjam %></td>
+        <td><%= data.buku_id && data.buku_id.nama ? data.buku_id.nama : 'belum ada buku' %></td>
+        <td>
+          <style>
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+        
+            .btn-edit {
+                background-color: #007bff;
+                color: white;
+                transition: background-color 0.3s ease;
+            }
+        
+            .btn-edit:hover {
+                background-color: #0056b3;
+            }
+        </style>
+          <!-- Tombol Ubah -->
+          <button onclick="showUpdateForm('<%= data._id %>')" class="btn btn-edit">Ubah</button>
+
+          <style>
+            .btn-danger {
+                background-color: #dc3545;
+                color: white;
+            }
+        
+            .btn-danger:hover {
+                opacity: 0.9;
+            }
+        </style>
+        
+          <!-- Tombol untuk hapus buku -->
+          <button onclick="confirmDelete('<%= data._id %>', '<%= data.tanggalPinjam %>')" class="btn btn-danger">Hapus</button>
+      </td>
+    </tr>
+
+      <style>
+        form {
+            margin: 10px 0;
+        }
+    
+        form div {
+            margin-bottom: 10px;
+        }
+    
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+    
+        input {
+            padding: 5px;
+            width: 200px;
+        }
+    
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+    
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+    
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>  
+
+      <script>
+        function showUpdateForm(id) {
+            document.getElementById(`form-${id}`).style.display = "table-row";
+        }
+    
+        function hideUpdateForm(id) {
+            document.getElementById(`form-${id}`).style.display = "none";
+        }
+    </script>
+
+<script>
+  function confirmDelete(id, tanggalPinjam) {
+      const confirmed = confirm(`Apakah Anda yakin ingin menghapus peminjaman "${tanggalPinjam}"?`);
+      if (confirmed) {
+          // Redirect ke endpoint hapus buku
+          window.location.href = `/peminjaman/delete/${id}`;
+      }
+  }
+</script>
+
+      <!-- <div id="updateFormContainer" style="display: none; margin-top: 20px;">
+        <h2>Ubah Peminjaman</h2>
+        <form id="updateForm" action="/peminjaman/update" method="POST">
+            <input type="hidden" id="updateId" name="id" />
+            <div class="mb-3">
+                <label for="updateTanggalPinjam" class="form-label">Tanggal Pinjaman</label>
+                <input type="date" class="form-control" id="updateTanggalPinjam" name="tanggalPinjam" required />
+            </div>
+            <div class="mb-3">
+                <label for="updateTanggalKembali" class="form-label">Tanggal Kembalian</label>
+                <input type="date" class="form-control" id="updateTanggalKembali" name="tanggalKembali" required />
+            </div>
+            <div class="mb-3">
+                <label for="updateBatasPinjam" class="form-label">Batas Pinjam</label>
+                <input type="text" class="form-control" id="updateBatasPinjam" name="batasPinjam" required />
+            </div>
+            <div class="mb-3">
+                <label for="updateBukuId" class="form-label">Buku</label>
+                <select class="form-control" id="updateBukuId" name="buku_id" required>
+                    <option value="">-- Pilih Buku --</option>
+                    <% bukuList.forEach(buku => { %>
+                        <option value="<%= buku._id %>"><%= buku.nama %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+        </form>
+    </div> -->
+    <!-- Form Update Buku -->
+    <tr id="form-<%= data._id %>" style="display: none;">
+      <td colspan="5">
+          <form action="/peminjaman/update" method="POST">
+            <input type="hidden" name="id" value="<%= data._id %>">
+              <div>
+                  <label for="tanggalPinjam<%= data._id %>">Tanggal Pinjam:</label>
+                  <input type="text" id="tanggalPinjam<%= data._id %>" name="tanggalPinjam" value="<%= data.tanggalPinjam %>" required>
+              </div>
+              <div>
+                  <label for="tanggalKembali<%= data._id %>">Tanggal Kembali:</label>
+                  <input type="text" id="tanggalKembali<%= data._id %>" name="tanggalKembali" value="<%= data.tanggalKembali %>" required>
+              </div>
+              <div>
+                  <label for="batasPinjam<%= data._id %>">Batas Pinjam:</label>
+                  <input type="text" id="batasPinjam<%= data._id %>" name="batasPinjam" value="<%= data.batasPinjam %>" required>
+              </div>
+              <div>
+                <label for="buku_id<%= data._id %>">Buku</label>
+                <select id="buku_id<%= data._id %>" name="buku_id" required>
+                    <option value="">-- Pilih Buku --</option>
+                    <% bukuList.forEach(buku => { %>
+                        <option value="<%= buku._id %>" <%= buku._id === (data.buku_id ? data.buku_id._id : '') ? 'selected' : '' %>>
+                            <%= buku.nama %>
+                        </option>
+                    <% }) %>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+              <button type="button" onclick="hideUpdateForm('<%= data._id %>')" class="btn btn-secondary">Batal</button>
+          </form>
+          <!-- ada -->
+      </td>
+  </tr>
+
+    <% }) %>
+</table>
